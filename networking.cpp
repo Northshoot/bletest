@@ -9,7 +9,54 @@
 #include <lib_aci.h>
 #include "networking.h"
 
-#define DEBUG 0
+
+void setup(void)
+{
+  Serial.begin(115200);
+
+
+  Serial.println(F("Arduino setup"));
+
+  /**
+  Point ACI data structures to the the setup data that the nRFgo studio generated for the nRF8001
+  */
+  if (NULL != services_pipe_type_mapping)
+  {
+    aci_state.aci_setup_info.services_pipe_type_mapping = &services_pipe_type_mapping[0];
+  }
+  else
+  {
+    aci_state.aci_setup_info.services_pipe_type_mapping = NULL;
+  }
+  aci_state.aci_setup_info.number_of_pipes    = NUMBER_OF_PIPES;
+  aci_state.aci_setup_info.setup_msgs         = setup_msgs;
+  aci_state.aci_setup_info.num_setup_msgs     = NB_SETUP_MESSAGES;
+
+  //Tell the ACI library, the MCU to nRF8001 pin connections
+  aci_state.aci_pins.board_name = BOARD_DEFAULT; //REDBEARLAB_SHIELD_V1_1 See board.h for details
+  aci_state.aci_pins.reqn_pin   = 9;
+  aci_state.aci_pins.rdyn_pin   = 8;
+  aci_state.aci_pins.mosi_pin   = MOSI;
+  aci_state.aci_pins.miso_pin   = MISO;
+  aci_state.aci_pins.sck_pin    = SCK;
+
+  aci_state.aci_pins.spi_clock_divider      = SPI_CLOCK_DIV8;//SPI_CLOCK_DIV8  = 2MHz SPI speed
+                                                             //SPI_CLOCK_DIV16 = 1MHz SPI speed
+
+  aci_state.aci_pins.reset_pin              = 4;
+  aci_state.aci_pins.active_pin             = UNUSED;
+  aci_state.aci_pins.optional_chip_sel_pin  = UNUSED;
+
+  aci_state.aci_pins.interface_is_interrupt = false;
+  aci_state.aci_pins.interrupt_number       = UNUSED;
+
+  /** We reset the nRF8001 here by toggling the RESET line connected to the nRF8001
+   *  and initialize the data structures required to setup the nRF8001
+   */
+  //The second parameter is for turning debug printing on for the ACI Commands and Events so they be printed on the Serial
+  lib_aci_init(&aci_state, true);
+
+}
 
 /* Define how assert should function in the BLE library */
 void __ble_assert(const char *file, uint16_t line) {
@@ -113,25 +160,19 @@ void ble_net_loop() {
 				Serial.print(F("ACI Command 0x"));
 				Serial.println(aci_evt->params.cmd_rsp.cmd_opcode, HEX);
 				Serial.println(
-						F(
-								"Evt Cmd respone: Error. Arduino is in an while(1); loop"));
+						F("Evt Cmd respone: Error. Arduino is in an while(1); loop"));
 				while (1)
 					;
 			} else {
 				switch (aci_evt->params.cmd_rsp.cmd_opcode) {
 				case PIPE_LARRY_SERVICE_RANDOMNUMBER_TX:
-
 					Serial.print(F("Battery level value received: "));
-
 				}
 			}
 			break;
 
 		case ACI_EVT_PIPE_STATUS:
-#ifdef DEBUG
-			Serial.print(__LINE__ + 3);
-			Serial.print(F(" :: "));
-#endif
+
 			Serial.println(F("ACI_EVT_PIPE_STATUS"));
 
 			if (lib_aci_is_pipe_available(&aci_state,
@@ -258,6 +299,9 @@ void ble_net_loop() {
 	if (setup_required) {
 		if (SETUP_SUCCESS == do_aci_setup(&aci_state)) {
 			setup_required = false;
+			Serial.println(F("SETUP_SUCCESS"));
+		} else {
+			Serial.println(F("SETUP_FAIL"));
 		}
 	}
 }
