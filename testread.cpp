@@ -24,7 +24,7 @@ void randomNum(void)
 		} else {
 			Serial.println(F("FAIL lib send data"));
 		}
-		radio_ack_pending = true;
+
 
 	} else {
 		Serial.println(F("NOT Sending"));
@@ -44,7 +44,7 @@ Function:   Handles the Timer1-overflow interrupt
 FUNC ***/
 ISR(TIMER1_OVF_vect)
 {
-  randomNum();
+  //randomNum();
   TCNT1H = 11;    // Approx 4000 ms - Reload
   TCNT1L = 0;
   TIFR1  = 0x00;    // timer1 int flag reg: clear timer overflow flag

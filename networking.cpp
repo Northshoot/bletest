@@ -166,7 +166,11 @@ void ble_net_loop() {
 			} else {
 				switch (aci_evt->params.cmd_rsp.cmd_opcode) {
 				case PIPE_LARRY_SERVICE_RANDOMNUMBER_TX:
-					Serial.print(F("Battery level value received: "));
+					Serial.print(F("PIPE_LARRY_SERVICE_RANDOMNUMBER_TX: "));
+					break;
+				case PIPE_LARS_SERVICE_RANDOMSUM_RX:
+					Serial.print(F("PIPE_LARS_SERVICE_RANDOMSUM_RX: "));
+					break;
 				}
 			}
 			break;
@@ -178,11 +182,13 @@ void ble_net_loop() {
 			if (lib_aci_is_pipe_available(&aci_state,
 			PIPE_LARS_SERVICE_RANDOMSUM_RX_REQ)) {
 				Serial.print(F("PIPE_LARS_SERVICE_RANDOMSUM_RX_REQ"));
+
 			} else if (lib_aci_is_pipe_available(&aci_state,
 			PIPE_LARS_SERVICE_RANDOMSUM_RX)) {
 				Serial.print(F("PIPE_LARS_SERVICE_RANDOMSUM_RX"));
 			} else {
-				Serial.println(F("Other pipe"));
+				Serial.print(F("Other pipe: "));
+				//Serial.println(aci_stat->pipes_open_bitmap[0],DEC);
 			}
 			break;
 		case ACI_EVT_DATA_RECEIVED:
@@ -219,8 +225,16 @@ void ble_net_loop() {
 			timing_change_done = false;
 			Serial.println(F("ACI_EVT_CONNECTED"));
 			//we are connected request remote pipe
-			remote_pipe = lib_aci_open_remote_pipe(&aci_state,
-			PIPE_LARS_SERVICE_RANDOMSUM_RX);
+//			remote_pipe = lib_aci_open_remote_pipe(&aci_state,
+//			PIPE_LARS_SERVICE_RANDOMSUM_RX);
+//			Serial.println(F("lib_aci_open_remote_pipe(&aci_state(PIPE_LARS_SERVICE_RANDOMSUM_RX);"));
+//			if ( remote_pipe ) {
+//
+//			} else {
+//				Serial.println("Remote pipe down");
+//				remote_pipe = lib_aci_open_remote_pipe(&aci_state,
+//							PIPE_LARS_SERVICE_RANDOMSUM_RX_REQ);
+//			}
 			break;
 
 		case ACI_EVT_DATA_CREDIT:

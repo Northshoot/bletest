@@ -88,9 +88,6 @@
         <ServiceToAdvertise>
             <Uuid>0069</Uuid>
         </ServiceToAdvertise>
-        <SercieToSolicitate>
-            <Uuid>6660</Uuid>
-        </SercieToSolicitate>
         <CustomAdTypes/>
     </Gapsettings>
     <Hardwaresettings>
