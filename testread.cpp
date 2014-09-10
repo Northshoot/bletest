@@ -10,31 +10,17 @@
 void randomNum(void)
 {
 	uint8_t rnd = random(0, 255);
+	bool rqData = false;
 
-	lib_aci_set_local_data(&aci_state, PIPE_LARRY_SERVICE_RANDOMNUMBER_TX, &rnd,
-			sizeof(rnd));
-	if (lib_aci_is_pipe_available(&aci_state,
-	PIPE_LARRY_SERVICE_RANDOMNUMBER_TX)) {
-		//is sending them it is subscribed
-
-		if (lib_aci_send_data(PIPE_LARRY_SERVICE_RANDOMNUMBER_TX, &rnd,
-				sizeof(rnd))) {
-			Serial.println(F("OK lib send data"));
-			aci_state.data_credit_available--;
-		} else {
-			Serial.println(F("FAIL lib send data"));
-		}
-
-
-	} else {
-		Serial.println(F("NOT Sending"));
+	if( lib_aci_is_pipe_available(&aci_state,
+			PIPE_LARS_SERVICE_RANDOMSUM_RX_REQ) ){
+		Serial.println(F("pipe available PIPE_LARS_SERVICE_RANDOMSUM_RX_REQ "));
+		rqData = lib_aci_request_data(&aci_state,
+			PIPE_LARS_SERVICE_RANDOMSUM_RX_REQ);
+		if(rqData)
+			Serial.println(F("Requested data on pipe"));
 	}
-
-	Serial.print(F("perform random number: HEX: "));
-	Serial.print(rnd, HEX);
-	Serial.print(F(" DEC "));
-	Serial.print(rnd);
-	Serial.println("\n");
+	Serial.println(F("randomNum loop "));
 
 }
 
@@ -44,7 +30,7 @@ Function:   Handles the Timer1-overflow interrupt
 FUNC ***/
 ISR(TIMER1_OVF_vect)
 {
-  //randomNum();
+  randomNum();
   TCNT1H = 11;    // Approx 4000 ms - Reload
   TCNT1L = 0;
   TIFR1  = 0x00;    // timer1 int flag reg: clear timer overflow flag
@@ -58,4 +44,5 @@ ISR(TIMER1_OVF_vect)
 void loop()
 {
 	ble_net_loop();
+
 }

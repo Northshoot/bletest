@@ -164,14 +164,16 @@ void ble_net_loop() {
 				while (1)
 					;
 			} else {
-				switch (aci_evt->params.cmd_rsp.cmd_opcode) {
-				case PIPE_LARRY_SERVICE_RANDOMNUMBER_TX:
-					Serial.print(F("PIPE_LARRY_SERVICE_RANDOMNUMBER_TX: "));
-					break;
-				case PIPE_LARS_SERVICE_RANDOMSUM_RX:
-					Serial.print(F("PIPE_LARS_SERVICE_RANDOMSUM_RX: "));
-					break;
-				}
+				Serial.print(F("aci_evt->params.cmd_rsp.cmd_opcode: "));
+				Serial.print(aci_evt->params.cmd_rsp.cmd_opcode,HEX);
+//				switch (aci_evt->params.cmd_rsp.cmd_opcode) {
+//				case PIPE_LARRY_SERVICE_RANDOMNUMBER_TX:
+//					Serial.print(F("PIPE_LARRY_SERVICE_RANDOMNUMBER_TX: "));
+//					break;
+//				case PIPE_LARS_SERVICE_RANDOMSUM_RX:
+//					Serial.print(F("PIPE_LARS_SERVICE_RANDOMSUM_RX: "));
+//					break;
+//				}
 			}
 			break;
 
@@ -181,14 +183,19 @@ void ble_net_loop() {
 
 			if (lib_aci_is_pipe_available(&aci_state,
 			PIPE_LARS_SERVICE_RANDOMSUM_RX_REQ)) {
-				Serial.print(F("PIPE_LARS_SERVICE_RANDOMSUM_RX_REQ"));
-
-			} else if (lib_aci_is_pipe_available(&aci_state,
-			PIPE_LARS_SERVICE_RANDOMSUM_RX)) {
-				Serial.print(F("PIPE_LARS_SERVICE_RANDOMSUM_RX"));
+				Serial.println(F(" Pipe status available PIPE_LARS_SERVICE_RANDOMSUM_RX_REQ"));
+				if(lib_aci_request_data(&aci_state, PIPE_LARS_SERVICE_RANDOMSUM_RX_REQ)) {
+					Serial.println(F("Data requested"));
+				} else {
+					Serial.println(F("Data request failed"));
+				}
 			} else {
 				Serial.print(F("Other pipe: "));
-				//Serial.println(aci_stat->pipes_open_bitmap[0],DEC);
+			}
+			if ( lib_aci_is_pipe_closed(&aci_state,
+			PIPE_LARS_SERVICE_RANDOMSUM_RX_REQ)){
+				Serial.println(F(" Pipe closed PIPE_LARS_SERVICE_RANDOMSUM_RX_REQ"));
+				lib_aci_open_remote_pipe(&aci_state, PIPE_LARS_SERVICE_RANDOMSUM_RX_REQ);
 			}
 			break;
 		case ACI_EVT_DATA_RECEIVED:
@@ -223,29 +230,17 @@ void ble_net_loop() {
 			radio_ack_pending = false;
 			aci_state.data_credit_available = aci_state.data_credit_total;
 			timing_change_done = false;
-			Serial.println(F("ACI_EVT_CONNECTED"));
-			//we are connected request remote pipe
-//			remote_pipe = lib_aci_open_remote_pipe(&aci_state,
-//			PIPE_LARS_SERVICE_RANDOMSUM_RX);
-//			Serial.println(F("lib_aci_open_remote_pipe(&aci_state(PIPE_LARS_SERVICE_RANDOMSUM_RX);"));
-//			if ( remote_pipe ) {
-//
-//			} else {
-//				Serial.println("Remote pipe down");
-//				remote_pipe = lib_aci_open_remote_pipe(&aci_state,
-//							PIPE_LARS_SERVICE_RANDOMSUM_RX_REQ);
-//			}
+			Serial.print(F("ACI_EVT_CONNECTED, total credit: "));
+			Serial.print(aci_state.data_credit_available, DEC);
+
 			break;
 
-		case ACI_EVT_DATA_CREDIT:
-			aci_state.data_credit_available = aci_state.data_credit_available
-					+ aci_evt->params.data_credit.credit;
-			/**
-			 Bluetooth Radio ack received from the peer radio for the data packet sent.
-			 This also signals that the buffer used by the nRF8001 for the data packet is available again.
-			 */
-			radio_ack_pending = false;
-			break;
+      case ACI_EVT_DATA_CREDIT:
+		aci_state.data_credit_available = aci_state.data_credit_available + aci_evt->params.data_credit.credit;
+		Serial.print("ACI_EVT_DATA_CREDIT     ");
+		Serial.print("Data Credit available: ");
+		Serial.println(aci_state.data_credit_available,DEC);
+		break;
 
 		case ACI_EVT_PIPE_ERROR:
 			//See the appendix in the nRF8001 Product Specication for details on the error codes
@@ -305,6 +300,8 @@ void ble_net_loop() {
 		// If No event in the ACI Event queue and No event in the ACI Command queue
 		// Arduino can go to sleep
 	}
+	//bool ope = lib_aci_is_pipe_available(&aci_state, PIPE_LARS_SERVICE_RANDOMSUM_RX_REQ);
+	//Serial.println((int)ope, DEC);
 
 	/* setup_required is set to true when the device starts up and enters setup mode.
 	 * It indicates that do_aci_setup() should be called. The flag should be cleared if
