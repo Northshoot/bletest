@@ -33,7 +33,7 @@ static hal_aci_data_t setup_msgs[NB_SETUP_MESSAGES] PROGMEM = SETUP_MESSAGES_CON
 // Current pipe closed bitmap
 // Current connection interval, slave latency and link supervision timeout
 // Current State of the the GATT client (Service Discovery)
-static aci_state_t aci_state;
+extern aci_state_t aci_state;
 
 static hal_aci_evt_t aci_data;
 

@@ -5,11 +5,11 @@
 #include <aci_setup.h>
 #include "networking.h"
 
-
+aci_state_t aci_state;
 
 void randomNum(void)
 {
-	uint8_t rnd = random(0, 255);
+
 	bool rqData = false;
 
 	if( lib_aci_is_pipe_available(&aci_state,
@@ -31,8 +31,8 @@ FUNC ***/
 ISR(TIMER1_OVF_vect)
 {
   randomNum();
-  TCNT1H = 11;    // Approx 4000 ms - Reload
-  TCNT1L = 0;
+  TCNT1H = 0;    // Approx 4000 ms - Reload
+  TCNT1L = 11;
   TIFR1  = 0x00;    // timer1 int flag reg: clear timer overflow flag
 };
 
@@ -44,5 +44,4 @@ ISR(TIMER1_OVF_vect)
 void loop()
 {
 	ble_net_loop();
-
 }

@@ -9,7 +9,6 @@
 #include <lib_aci.h>
 #include "networking.h"
 
-
 void setup(void)
 {
   Serial.begin(115200);
@@ -54,7 +53,7 @@ void setup(void)
    *  and initialize the data structures required to setup the nRF8001
    */
   //The second parameter is for turning debug printing on for the ACI Commands and Events so they be printed on the Serial
-  lib_aci_init(&aci_state, true);
+  lib_aci_init(&aci_state, false);
 
 }
 
@@ -110,7 +109,6 @@ void Timer1stop() {
 	TIMSK1 = 0x00;
 }
 
-bool remote_pipe = false;
 void ble_net_loop() {
 	static bool setup_required = false;
 	// We enter the if statement only when there is a ACI event available to be processed
@@ -300,8 +298,6 @@ void ble_net_loop() {
 		// If No event in the ACI Event queue and No event in the ACI Command queue
 		// Arduino can go to sleep
 	}
-	//bool ope = lib_aci_is_pipe_available(&aci_state, PIPE_LARS_SERVICE_RANDOMSUM_RX_REQ);
-	//Serial.println((int)ope, DEC);
 
 	/* setup_required is set to true when the device starts up and enters setup mode.
 	 * It indicates that do_aci_setup() should be called. The flag should be cleared if
