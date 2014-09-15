@@ -33,7 +33,7 @@ static hal_aci_data_t setup_msgs[NB_SETUP_MESSAGES] PROGMEM = SETUP_MESSAGES_CON
 // Current pipe closed bitmap
 // Current connection interval, slave latency and link supervision timeout
 // Current State of the the GATT client (Service Discovery)
-extern aci_state_t aci_state;
+static aci_state_t aci_state;
 
 static hal_aci_evt_t aci_data;
 
@@ -47,7 +47,14 @@ static uint8_t rx_buffer_len = 0;
 static uint8_t *p_before = &rx_buff[0] ;
 static uint8_t *p_back = &rx_buff[0];
 
+/**
+ * Functions for handling connections and getting data to the application
+ *
+ */
 
+bool isDataAvailable(uint8_t pipe);
+extern bool readRemoteServiceData(uint8_t pipe);
+extern uint8_t getData();
 void ble_net_loop(void);
 
 

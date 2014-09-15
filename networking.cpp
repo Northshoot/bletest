@@ -9,6 +9,8 @@
 #include <lib_aci.h>
 #include "networking.h"
 
+bool dataAvailable;
+uint8_t rx_data;
 void setup(void)
 {
   Serial.begin(115200);
@@ -54,6 +56,7 @@ void setup(void)
    */
   //The second parameter is for turning debug printing on for the ACI Commands and Events so they be printed on the Serial
   lib_aci_init(&aci_state, false);
+  dataAvailable=false;
 
 }
 
@@ -109,6 +112,29 @@ void Timer1stop() {
 	TIMSK1 = 0x00;
 }
 
+
+bool isDataAvailable(uint8_t pipe)
+{
+	return dataAvailable;
+}
+
+bool readRemoteServiceData(uint8_t pipe){
+	Serial.println(F("readRemoteServiceData"));
+	if( lib_aci_is_pipe_available(&aci_state, pipe) ){
+		Serial.print(F("pipe available: "));
+		Serial.println(pipe, DEC);
+		return lib_aci_request_data(&aci_state, pipe);
+
+	} else {
+		Serial.println(F("lib_aci_is_pipe_available not available"));
+		return false;
+	}
+
+}
+
+uint8_t getData(){
+	return rx_data;
+}
 void ble_net_loop() {
 	static bool setup_required = false;
 	// We enter the if statement only when there is a ACI event available to be processed
@@ -176,17 +202,16 @@ void ble_net_loop() {
 			break;
 
 		case ACI_EVT_PIPE_STATUS:
-
 			Serial.println(F("ACI_EVT_PIPE_STATUS"));
 
 			if (lib_aci_is_pipe_available(&aci_state,
 			PIPE_LARS_SERVICE_RANDOMSUM_RX_REQ)) {
 				Serial.println(F(" Pipe status available PIPE_LARS_SERVICE_RANDOMSUM_RX_REQ"));
-				if(lib_aci_request_data(&aci_state, PIPE_LARS_SERVICE_RANDOMSUM_RX_REQ)) {
-					Serial.println(F("Data requested"));
-				} else {
-					Serial.println(F("Data request failed"));
-				}
+//				if(lib_aci_request_data(&aci_state, PIPE_LARS_SERVICE_RANDOMSUM_RX_REQ)) {
+//					Serial.println(F("Data requested"));
+//				} else {
+//					Serial.println(F("Data request failed"));
+//				}
 			} else {
 				Serial.print(F("Other pipe: "));
 			}
@@ -198,20 +223,31 @@ void ble_net_loop() {
 			break;
 		case ACI_EVT_DATA_RECEIVED:
 			Serial.print(F("ACI_EVT_DATA_RECEIVED: "));
-			Serial.println(aci_evt->params.data_received.rx_data.pipe_number,
-					DEC);
-			for (int i = 0; i < aci_evt->len - 2; i++) {
-				if (rx_buffer_len == MAX_RX_BUFF) {
-					break;
-				} else {
-					if (p_back == &rx_buff[MAX_RX_BUFF]) {
-						p_back = &rx_buff[0];
-					}
-					*p_back = aci_evt->params.data_received.rx_data.aci_data[i];
-					rx_buffer_len++;
-					p_back++;
-				}
+			//handle data reception depending on the service
+			switch(aci_evt->params.data_received.rx_data.pipe_number){
+				case PIPE_LARS_SERVICE_RANDOMSUM_RX_REQ:
+					rx_data = aci_evt->params.data_received.rx_data.aci_data[0];
+					Serial.println(rx_data);
+//					for (int i = 0; i < aci_evt->len - 2; i++) {
+//						if (rx_buffer_len == MAX_RX_BUFF) {
+//							break;
+//						} else {
+//							if (p_back == &rx_buff[MAX_RX_BUFF]) {
+//								p_back = &rx_buff[0];
+//							}
+//							*p_back = aci_evt->params.data_received.rx_data.aci_data[i];
+//
+//							rx_buffer_len++;
+//							p_back++;
+//						}
+//					}
+
+				break;
+
+				default:
+					Serial.println(F("Should not end up here"));
 			}
+
 
 			break;
 

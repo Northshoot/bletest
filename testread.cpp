@@ -4,23 +4,28 @@
 #include <lib_aci.h>
 #include <aci_setup.h>
 #include "networking.h"
+#include "InsulinePump.h"
 
-aci_state_t aci_state;
 
 void randomNum(void)
 {
 
 	bool rqData = false;
-
-	if( lib_aci_is_pipe_available(&aci_state,
-			PIPE_LARS_SERVICE_RANDOMSUM_RX_REQ) ){
-		Serial.println(F("pipe available PIPE_LARS_SERVICE_RANDOMSUM_RX_REQ "));
-		rqData = lib_aci_request_data(&aci_state,
-			PIPE_LARS_SERVICE_RANDOMSUM_RX_REQ);
-		if(rqData)
-			Serial.println(F("Requested data on pipe"));
+	uint8_t data;
+//	if( lib_aci_is_pipe_available(&aci_state,
+//			PIPE_LARS_SERVICE_RANDOMSUM_RX_REQ) ){
+//		Serial.println(F("pipe available PIPE_LARS_SERVICE_RANDOMSUM_RX_REQ "));
+//		rqData = lib_aci_request_data(&aci_state,
+//			PIPE_LARS_SERVICE_RANDOMSUM_RX_REQ);
+//		if(rqData)
+//			Serial.println(F("Requested data on pipe"));
+//	}
+//	Serial.println(F("randomNum loop "));
+	if(readRemoteServiceData(PIPE_LARS_SERVICE_RANDOMSUM_RX_REQ)){
+		data = getData();
+		Serial.print(F("My data is:::: "));
+		Serial.println(data, DEC);
 	}
-	Serial.println(F("randomNum loop "));
 
 }
 
