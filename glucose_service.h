@@ -25,15 +25,56 @@
 #define GLUCOSE_SERVICE_H_
 
 
-#define NIBBLE_MASK 0xf0
 
-typedef enum  {UNKNOWN, JAN,FEB,MAR,APR,MAY,JUN,JUL,AUG,SEP,OCT,DEC} Month;
-typedef enum  {RESERVED, BREAKFAST, LUNCH,DINNER, SNACK, DRINK,SUPPER, BRUNCH, RESERVED1} CarbohydrateID;
-typedef enum {RESERVED, PREPRANDIAL, POSTPRANDIAL, FASTING, CASUAL,BEDTIME,RESERVED1} Meal;
-typedef enum {RESERVED,SELF,HEALTHCAREPROFESSIONAL,LABTEST,NOTAVAILABLE,RESERVED1} Tester;
-typedef enum{RESERVED, MINOR,MAJOR,MENSES,STRESS,NONE,NOTAVAILABLE,RESERVED1} Health;
-typedef enum {RESERVER, RAPID, SHORT, INTERMEDIATE, LONG, PREMIXED, RESERVED1} MedicationID;
+typedef enum {UNKNOWN=0x0,	JAN=0x1,			FEB=0x2,			MAR=0x3,
+				APR=0x4,	MAY=0x5,			JUN=0x6,			JUL=0x7,
+				AUG=0x8,	SEP=0x9,			OCT=0xA,			DEC=0xB
+			} Month;
 
+typedef enum {RESERVED=0x0,	BREAKFAST=0x1, 		LUNCH=0x2,			DINNER=0x3,
+				SNACK=0x4, 	DRINK=0x5,			SUPPER=0x6, 		BRUNCH,
+				RESERVED1
+			} CarbohydrateID;
+
+typedef enum {RESERVED=0x0,	PREPRANDIAL=0x1,	POSTPRANDIAL=0x2, 	FASTING=0x3,
+				CASUAL=0x4,	BEDTIME=0x5,		RESERVED1=0x6
+			} Meal;
+
+typedef enum {RESERVED=0x0,	SELF=0x1,			HEALTHCAREPRO=0x2,	LABTEST=0x3,
+				NOTAVLB=0x4,RESERVED1=0x5
+			} Tester;
+
+typedef enum {RESERVED=0x0, MINOR=0x1,	MAJOR=0x2,			MENSES=0x3,
+				STRESS=0x4,	NONE=0x5,	NOTAVAILABLE=0x6,	RESERVED1=0x7
+			} Health;
+
+typedef enum {RESERVER=0x0, RAPID=0x1, 			SHORT=0x2, 			INTERME=0x3,
+				LONG=0x4, 	PREMIXED=0x5, 		RESERVED1=0x6
+			} MedicationID;
+
+typedef enum {RESERVED0=0x0,			CAPILLARY_WHOLE=0x1, 	CAPILLARY_PLASMA=0x2,	VENOUS_WHOLE=0x3,
+			   VENOUS_PLASMA=0x4, 		ARTERIAL_WHOLE=0x5, 	ARTERIAL_PLASMA=0x6,	UNDETERMINED_WHOLE=0x7,
+			   UNDETERMINED_PLASMA=0x8,	IFS=0x9, 				CONTROL=0xA, 			RESERVED11=0xB,
+			   RESERVED12=0xC,			RESERVED13=0xD,			RESERVED14=0xE, 		RESERVED15=0xF,
+			   RESERVED_S1=0x10,		FINGER=0x11,			AST=0x12,				EARLOBE=0x13,
+			   CONROLSOLIUTION=0x14,	NOT_AVAILABLE=0x15
+			} GlucoseTypeNSampleLocation;
+
+typedef enum {RESERVED=0x0,		REPORT_SR=0x1, 		DELETE_SR=0x2,		ABORT=0x3,
+			  NUMBER_SR=0x4, 	RESPONSE=0x5
+			} OpCode;
+typedef enum {NULL=0x0,			ALL_RECORDS=0x1, 	LTEQ=0x2,		GTEQ=0x3,
+			  WITHIN_RANGE=0x4,	FIRST=0x5,			LAST=0x6,		RESERVED=0x7
+			} Operator;
+
+typedef enum {NA=0x0,				FILTER_PARAM1=0x1, 		FILTER_PARAM2=0x2, 	NOT_INCLUDED=0x3,
+			  FILTER_PARAM3=0x4,	NUMBER_OF_RECORDS=0x5, 	RQ_OP_CODE,RESERVED=0x6
+			} Operand;
+
+typedef enum {RESERVED=0x0,			SUCCESS=0x1,		 NOT_SPRT_OP_CODE=0x2, INVD=0x3,
+			  NOT_SPRT_OPERAND=0x4,	INVALID_OPERAND=0x5, NO_RECORDS=0x6, 		ABORT_UNSUCCESSFUL=0x7,
+			  PROCEDURE_NOT_COMPLETED=0x8,  NOT_SUPPORTED_OPERAND_2=0x9, RESERVED2=0xA
+			}ResponseCodeValues;
 
 typedef struct {
 	/***
@@ -131,6 +172,7 @@ typedef struct {
 	uint8_t GlucoseTypeNSampleLocation;
 	uint16_t SensorStatusAnnunciation;
 } GlucoseMeasurment;
+
 
 /**
  * Name: Glucose Measurement Context
@@ -283,13 +325,7 @@ typedef struct {
 	uint16_t bitfield;
 } GlucoseFeature;
 
-typedef enum {RESERVED,REPORT_SR, DELETE_SR,ABORT, NUMBER_SR, RESPONSE} OpCode;
-typedef enum {NULL,ALL_RECORDS, LTEQ,GTEQ,WITHIN_RANGE,FIRST,LAST,RESERVED} Operator;
-typedef enum {NA,FILTER_PARAM1, FILTER_PARAM2, NOT_INCLUDED,FILTER_PARAM3,
-				NUMBER_OF_RECORDS, RQ_OP_CODE,RESERVED} Operand;
-typedef enum {RESERVED,SUCCESS,NOT_SUPPORTED_OP_CODE, INVALID, NOT_SUPPORTED_OPERAND,
-				INVALID_OPERAND, NO_RECORDS, ABORT_UNSUCCESSFUL,PROCEDURE_NOT_COMPLETED,
-				NOT_SUPPORTED_OPERAND_2, RESERVED2}ResponseCodeValues;
+
 typedef struct {
 	/*
 	 Key	Value
@@ -305,15 +341,15 @@ typedef struct {
 	OpCode opcode;
 	/*
 	 *Enumerations
-Key	Value
-0	Null
-1	All records
-2	Less than or equal to
-3	Greater than or equal to
-4	Within range of (inclusive)
-5	First record(i.e. oldest record)
-6	Last record (i.e. most recent record)
-7 - 255	Reserved for future use
+		Key	Value
+		0	Null
+		1	All records
+		2	Less than or equal to
+		3	Greater than or equal to
+		4	Within range of (inclusive)
+		5	First record(i.e. oldest record)
+		6	Last record (i.e. most recent record)
+		7 - 255	Reserved for future use
 	 */
 	Operator operator;
 	/*
