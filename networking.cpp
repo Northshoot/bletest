@@ -16,7 +16,7 @@ void setup(void)
   Serial.begin(115200);
 
 
-  Serial.println(F("Arduino setup"));
+  Serial.println(F("Arduino setup: Insuline pump"));
 
   /**
   Point ACI data structures to the the setup data that the nRFgo studio generated for the nRF8001
@@ -205,42 +205,50 @@ void ble_net_loop() {
 			Serial.println(F("ACI_EVT_PIPE_STATUS"));
 
 			if (lib_aci_is_pipe_available(&aci_state,
-			PIPE_LARS_SERVICE_RANDOMSUM_RX_REQ)) {
-				Serial.println(F(" Pipe status available PIPE_LARS_SERVICE_RANDOMSUM_RX_REQ"));
-//				if(lib_aci_request_data(&aci_state, PIPE_LARS_SERVICE_RANDOMSUM_RX_REQ)) {
-//					Serial.println(F("Data requested"));
-//				} else {
-//					Serial.println(F("Data request failed"));
-//				}
+					PIPE_GLUCOSE_GLUCOSE_MEASURMENT_RX)) {
+				Serial.println(F(" Pipe status available PIPE_GLUCOSE_GLUCOSE_MEASURMENT_RX"));
+
+			} else if (lib_aci_is_pipe_available(&aci_state,
+					PIPE_GLUCOSE_GLUCOSE_MEASUREMENT_CONTEXT_RX)) {
+				Serial.println(F(" Pipe status available PIPE_GLUCOSE_GLUCOSE_MEASUREMENT_CONTEXT_RX"));
+
+			} else if (lib_aci_is_pipe_available(&aci_state,
+					PIPE_GLUCOSE_GLUCOSE_FEATURE_RX_REQ)) {
+				Serial.println(F(" Pipe status available PIPE_GLUCOSE_GLUCOSE_FEATURE_RX_REQ"));
+
+			} else if (lib_aci_is_pipe_available(&aci_state,
+					PIPE_GLUCOSE_RECORD_ACCESS_CONTROL_POINT_TX_ACK)) {
+				Serial.println(F(" Pipe status available PIPE_GLUCOSE_RECORD_ACCESS_CONTROL_POINT_TX_ACK"));
+
 			} else {
 				Serial.print(F("Other pipe: "));
 			}
 			if ( lib_aci_is_pipe_closed(&aci_state,
-			PIPE_LARS_SERVICE_RANDOMSUM_RX_REQ)){
+					PIPE_GLUCOSE_GLUCOSE_MEASURMENT_RX)){
 				Serial.println(F(" Pipe closed PIPE_LARS_SERVICE_RANDOMSUM_RX_REQ"));
-				lib_aci_open_remote_pipe(&aci_state, PIPE_LARS_SERVICE_RANDOMSUM_RX_REQ);
+				lib_aci_open_remote_pipe(&aci_state, PIPE_GLUCOSE_GLUCOSE_MEASURMENT_RX);
 			}
 			break;
 		case ACI_EVT_DATA_RECEIVED:
 			Serial.print(F("ACI_EVT_DATA_RECEIVED: "));
 			//handle data reception depending on the service
 			switch(aci_evt->params.data_received.rx_data.pipe_number){
-				case PIPE_LARS_SERVICE_RANDOMSUM_RX_REQ:
-					rx_data = aci_evt->params.data_received.rx_data.aci_data[0];
+				case PIPE_GLUCOSE_GLUCOSE_MEASURMENT_RX:
+
 					Serial.println(rx_data);
-//					for (int i = 0; i < aci_evt->len - 2; i++) {
-//						if (rx_buffer_len == MAX_RX_BUFF) {
-//							break;
-//						} else {
-//							if (p_back == &rx_buff[MAX_RX_BUFF]) {
-//								p_back = &rx_buff[0];
-//							}
-//							*p_back = aci_evt->params.data_received.rx_data.aci_data[i];
-//
-//							rx_buffer_len++;
-//							p_back++;
-//						}
-//					}
+					for (int i = 0; i < aci_evt->len - 2; i++) {
+						if (rx_buffer_len == MAX_RX_BUFF) {
+							break;
+						} else {
+							if (p_back == &rx_buff[MAX_RX_BUFF]) {
+								p_back = &rx_buff[0];
+							}
+							*p_back = aci_evt->params.data_received.rx_data.aci_data[i];
+
+							rx_buffer_len++;
+							p_back++;
+						}
+					}
 
 				break;
 

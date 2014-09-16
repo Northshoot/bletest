@@ -21,7 +21,7 @@ void randomNum(void)
 //			Serial.println(F("Requested data on pipe"));
 //	}
 //	Serial.println(F("randomNum loop "));
-	if(readRemoteServiceData(PIPE_LARS_SERVICE_RANDOMSUM_RX_REQ)){
+	if(readRemoteServiceData(PIPE_GLUCOSE_GLUCOSE_MEASURMENT_RX)){
 		data = getData();
 		Serial.print(F("My data is:::: "));
 		Serial.println(data, DEC);
