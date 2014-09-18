@@ -24,35 +24,34 @@
 #ifndef GLUCOSE_SERVICE_H_
 #define GLUCOSE_SERVICE_H_
 
+#include <Arduino.h>
+#include "BleBaseTime.h"
 
+typedef enum {RESERVED=0x0, RESERVED1=0x1,
+				RESERVED5=0x5, RESERVED6=0x6, RESERVED7=0x7,
+				RESERVED10=0xA
+			} Reserved;
 
-typedef enum {UNKNOWN=0x0,	JAN=0x1,			FEB=0x2,			MAR=0x3,
-				APR=0x4,	MAY=0x5,			JUN=0x6,			JUL=0x7,
-				AUG=0x8,	SEP=0x9,			OCT=0xA,			DEC=0xB
-			} Month;
-
-typedef enum {RESERVED=0x0,	BREAKFAST=0x1, 		LUNCH=0x2,			DINNER=0x3,
-				SNACK=0x4, 	DRINK=0x5,			SUPPER=0x6, 		BRUNCH,
-				RESERVED1
+typedef enum {/*RESERVED=0x0*/	BREAKFAST=0x1, 		LUNCH=0x2,			DINNER=0x3,
+				SNACK=0x4, 	DRINK=0x5,		SUPPER=0x6, 		BRUNCH=0x7,
+				RESERVED1_CID=0x8
 			} CarbohydrateID;
 
-typedef enum {RESERVED=0x0,	PREPRANDIAL=0x1,	POSTPRANDIAL=0x2, 	FASTING=0x3,
-				CASUAL=0x4,	BEDTIME=0x5,		RESERVED1=0x6
+typedef enum {	PREPRANDIAL=0x1,	POSTPRANDIAL=0x2, 	FASTING=0x3,
+				CASUAL=0x4,	BEDTIME=0x5
 			} Meal;
 
-typedef enum {RESERVED=0x0,	SELF=0x1,			HEALTHCAREPRO=0x2,	LABTEST=0x3,
-				NOTAVLB=0x4,RESERVED1=0x5
+typedef enum {SELF=0x1,	HEALTHCAREPRO=0x2,	LABTEST=0x3,	NOTAVLB=0x4
 			} Tester;
 
-typedef enum {RESERVED=0x0, MINOR=0x1,	MAJOR=0x2,			MENSES=0x3,
-				STRESS=0x4,	NONE=0x5,	NOTAVAILABLE=0x6,	RESERVED1=0x7
+typedef enum { MINOR=0x1,	MAJOR=0x2, MENSES=0x3,
+				STRESS=0x4,	NONE=0x5,	NOTAVAILABLE=0x6
 			} Health;
 
-typedef enum {RESERVER=0x0, RAPID=0x1, 			SHORT=0x2, 			INTERME=0x3,
-				LONG=0x4, 	PREMIXED=0x5, 		RESERVED1=0x6
+typedef enum {RAPID=0x1, 	SHORT=0x2, 	INTERME=0x3, LONG=0x4, 	PREMIXED=0x5
 			} MedicationID;
 
-typedef enum {RESERVED0=0x0,			CAPILLARY_WHOLE=0x1, 	CAPILLARY_PLASMA=0x2,	VENOUS_WHOLE=0x3,
+typedef enum {							CAPILLARY_WHOLE=0x1, 	CAPILLARY_PLASMA=0x2,	VENOUS_WHOLE=0x3,
 			   VENOUS_PLASMA=0x4, 		ARTERIAL_WHOLE=0x5, 	ARTERIAL_PLASMA=0x6,	UNDETERMINED_WHOLE=0x7,
 			   UNDETERMINED_PLASMA=0x8,	IFS=0x9, 				CONTROL=0xA, 			RESERVED11=0xB,
 			   RESERVED12=0xC,			RESERVED13=0xD,			RESERVED14=0xE, 		RESERVED15=0xF,
@@ -60,56 +59,23 @@ typedef enum {RESERVED0=0x0,			CAPILLARY_WHOLE=0x1, 	CAPILLARY_PLASMA=0x2,	VENOU
 			   CONROLSOLIUTION=0x14,	NOT_AVAILABLE=0x15
 			} GlucoseTypeNSampleLocation;
 
-typedef enum {RESERVED=0x0,		REPORT_SR=0x1, 		DELETE_SR=0x2,		ABORT=0x3,
+typedef enum {					REPORT_SR=0x1, 		DELETE_SR=0x2,		ABORT=0x3,
 			  NUMBER_SR=0x4, 	RESPONSE=0x5
 			} OpCode;
-typedef enum {NULL=0x0,			ALL_RECORDS=0x1, 	LTEQ=0x2,		GTEQ=0x3,
-			  WITHIN_RANGE=0x4,	FIRST=0x5,			LAST=0x6,		RESERVED=0x7
+typedef enum {NULL_=0x0,			ALL_RECORDS=0x1, LTEQ=0x2,		GTEQ=0x3,
+	  	  	  WITHIN_RANGE=0x4,	FIRST=0x5,			LAST=0x6
 			} Operator;
 
 typedef enum {NA=0x0,				FILTER_PARAM1=0x1, 		FILTER_PARAM2=0x2, 	NOT_INCLUDED=0x3,
-			  FILTER_PARAM3=0x4,	NUMBER_OF_RECORDS=0x5, 	RQ_OP_CODE,RESERVED=0x6
+			  FILTER_PARAM3=0x4,	NUMBER_OF_RECORDS=0x5, 	RQ_OP_CODE
 			} Operand;
 
-typedef enum {RESERVED=0x0,			SUCCESS=0x1,		 NOT_SPRT_OP_CODE=0x2, INVD=0x3,
+typedef enum {						SUCCESS=0x1,		 NOT_SPRT_OP_CODE=0x2, INVD=0x3,
 			  NOT_SPRT_OPERAND=0x4,	INVALID_OPERAND=0x5, NO_RECORDS=0x6, 		ABORT_UNSUCCESSFUL=0x7,
-			  PROCEDURE_NOT_COMPLETED=0x8,  NOT_SUPPORTED_OPERAND_2=0x9, RESERVED2=0xA
+			  PROCEDURE_NOT_COMPLETED=0x8,  NOT_SUPPORTED_OPERAND_2=0x9
 			}ResponseCodeValues;
 
-typedef struct {
-	/***
-	 * Name: Date Time
-Type: org.bluetooth.characteristic.date_timeDownload / View
-Assigned Number: 0x2A08
-Abstract:
-The Date Time characteristic is used to represent time.
 
-Summary:
-The Date Time characteristic contains fields
-or year, month, day, hours, minutes and seconds.
-Calendar days in Date Time are represented using Gregorian calendar.
-Hours in Date Time are represented in the 24h system.
- */
-	uint16_t year; //0	Year is not known
-/**	0	Month is not known
-	1	January
-	2	February
-	3	March
-	4	April
-	5	May
-	6	June
-	7	July
-	8	August
-	9	September
-	10	October
-	11	November
-	12	December*/
-	Month month;
-	uint8_t day; //0	Day is not known
-	uint8_t hours;
-	uint8_t minutes;
-	uint8_t seconds;
-} BaseTime;
 
 typedef struct {
 	/***
@@ -351,7 +317,7 @@ typedef struct {
 		6	Last record (i.e. most recent record)
 		7 - 255	Reserved for future use
 	 */
-	Operator operator;
+	Operator opertr;
 	/*
 		Op Code / Operand Value Correspondence
 		Key	Value

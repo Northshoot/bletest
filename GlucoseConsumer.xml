@@ -92,7 +92,7 @@
         </Characteristic>
     </Service>
     <Gapsettings>
-        <Name>GlucoseProvider</Name>
+        <Name>InsulinePump</Name>
         <DeviceNameWriteLength>0</DeviceNameWriteLength>
         <LocalPipeOnDeviceName>false</LocalPipeOnDeviceName>
         <DeviceNameShortLength>0</DeviceNameShortLength>
@@ -105,10 +105,10 @@
         <MinimumKeySize>7</MinimumKeySize>
         <MaximumKeySize>16</MaximumKeySize>
         <AdvertisingDataBondedBitmap>0</AdvertisingDataBondedBitmap>
-        <AdvertisingDataGeneralBitmap>c00</AdvertisingDataGeneralBitmap>
+        <AdvertisingDataGeneralBitmap>c10</AdvertisingDataGeneralBitmap>
         <AdvertisingDataBrodcastBitmap>0</AdvertisingDataBrodcastBitmap>
         <AdvertisingDataBondedScanResponseBitmap>0</AdvertisingDataBondedScanResponseBitmap>
-        <AdvertisingDataGeneralScanResponseBitmap>0</AdvertisingDataGeneralScanResponseBitmap>
+        <AdvertisingDataGeneralScanResponseBitmap>c10</AdvertisingDataGeneralScanResponseBitmap>
         <AdvertisingDataBrodcastScanResponseBitmap>0</AdvertisingDataBrodcastScanResponseBitmap>
         <AdvertisingDataBondedBitmapCustom>0</AdvertisingDataBondedBitmapCustom>
         <AdvertisingDataGeneralBitmapCustom>0</AdvertisingDataGeneralBitmapCustom>

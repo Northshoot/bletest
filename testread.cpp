@@ -10,21 +10,23 @@
 void randomNum(void)
 {
 
-	bool rqData = false;
+	bool rqData ;
 	uint8_t data;
-//	if( lib_aci_is_pipe_available(&aci_state,
-//			PIPE_LARS_SERVICE_RANDOMSUM_RX_REQ) ){
-//		Serial.println(F("pipe available PIPE_LARS_SERVICE_RANDOMSUM_RX_REQ "));
-//		rqData = lib_aci_request_data(&aci_state,
-//			PIPE_LARS_SERVICE_RANDOMSUM_RX_REQ);
-//		if(rqData)
-//			Serial.println(F("Requested data on pipe"));
-//	}
-//	Serial.println(F("randomNum loop "));
+
 	if(readRemoteServiceData(PIPE_GLUCOSE_GLUCOSE_MEASURMENT_RX)){
 		data = getData();
-		Serial.print(F("My data is:::: "));
-		Serial.println(data, DEC);
+		Serial.print(F("Got PIPE_GLUCOSE_GLUCOSE_MEASURMENT_RX"));
+		Serial.println(data, HEX);
+	}
+	if(readRemoteServiceData(PIPE_GLUCOSE_GLUCOSE_MEASUREMENT_CONTEXT_RX)){
+		data = getData();
+		Serial.print(F("Got PIPE_GLUCOSE_GLUCOSE_MEASUREMENT_CONTEXT_RX"));
+		Serial.println(data, HEX);
+	}
+	if(readRemoteServiceData(PIPE_GLUCOSE_GLUCOSE_FEATURE_RX_REQ)){
+		data = getData();
+		Serial.print(F("Got PIPE_GLUCOSE_GLUCOSE_FEATURE_RX_REQ"));
+		Serial.println(data, HEX);
 	}
 
 }

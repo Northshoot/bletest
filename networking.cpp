@@ -126,7 +126,8 @@ bool readRemoteServiceData(uint8_t pipe){
 		return lib_aci_request_data(&aci_state, pipe);
 
 	} else {
-		Serial.println(F("lib_aci_is_pipe_available not available"));
+		Serial.print(F("No Requested pipe "));
+		Serial.println(pipe, DEC);
 		return false;
 	}
 
@@ -135,8 +136,10 @@ bool readRemoteServiceData(uint8_t pipe){
 uint8_t getData(){
 	return rx_data;
 }
+
 void ble_net_loop() {
 	static bool setup_required = false;
+
 	// We enter the if statement only when there is a ACI event available to be processed
 	if (lib_aci_event_get(&aci_state, &aci_data)) {
 		aci_evt_t * aci_evt;
@@ -188,16 +191,9 @@ void ble_net_loop() {
 				while (1)
 					;
 			} else {
-				Serial.print(F("aci_evt->params.cmd_rsp.cmd_opcode: "));
-				Serial.print(aci_evt->params.cmd_rsp.cmd_opcode,HEX);
-//				switch (aci_evt->params.cmd_rsp.cmd_opcode) {
-//				case PIPE_LARRY_SERVICE_RANDOMNUMBER_TX:
-//					Serial.print(F("PIPE_LARRY_SERVICE_RANDOMNUMBER_TX: "));
-//					break;
-//				case PIPE_LARS_SERVICE_RANDOMSUM_RX:
-//					Serial.print(F("PIPE_LARS_SERVICE_RANDOMSUM_RX: "));
-//					break;
-//				}
+				Serial.print(F("aci_evt->params.cmd_rsp.cmd_opcode: 0x"));
+				Serial.println(aci_evt->params.cmd_rsp.cmd_opcode,HEX);
+
 			}
 			break;
 
@@ -222,10 +218,11 @@ void ble_net_loop() {
 
 			} else {
 				Serial.print(F("Other pipe: "));
+				Serial.println(aci_state.pipes_open_bitmap[0],HEX);
 			}
 			if ( lib_aci_is_pipe_closed(&aci_state,
 					PIPE_GLUCOSE_GLUCOSE_MEASURMENT_RX)){
-				Serial.println(F(" Pipe closed PIPE_LARS_SERVICE_RANDOMSUM_RX_REQ"));
+				Serial.println(F(" Pipe closed PIPE_GLUCOSE_GLUCOSE_MEASURMENT_RX"));
 				lib_aci_open_remote_pipe(&aci_state, PIPE_GLUCOSE_GLUCOSE_MEASURMENT_RX);
 			}
 			break;
@@ -290,6 +287,9 @@ void ble_net_loop() {
 			//Increment the credit available as the data packet was not sent.
 			//The pipe error also represents the Attribute protocol Error Response sent from the peer and that should not be counted
 			//for the credit.
+			Serial.print("ACI_EVT_PIPE_ERROR: ");
+			Serial.println(aci_evt->params.pipe_error.error_code,HEX);
+
 			if (ACI_STATUS_ERROR_PEER_ATT_ERROR
 					!= aci_evt->params.pipe_error.error_code) {
 				aci_state.data_credit_available++;
